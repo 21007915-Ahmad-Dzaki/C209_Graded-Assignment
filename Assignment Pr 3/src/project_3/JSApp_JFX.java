@@ -113,9 +113,13 @@ public class JSApp_JFX extends Application{
 		EventHandler<ActionEvent> handleView = (ActionEvent e) -> viewAll();
 		btView.setOnAction(handleView);
 		
-		if(checkPark.isSelected()) {
-			showPark();
-		}
+		EventHandler<ActionEvent> handleShowSpot = (ActionEvent e) -> viewByCat();
+		checkPark.setOnAction(handleShowSpot);
+		checkPC.setOnAction(handleShowSpot);
+		checkStadium.setOnAction(handleShowSpot);
+		
+		EventHandler<ActionEvent> handleAdd = (ActionEvent e) -> (new JSApp_Add()).start(new Stage());
+		btAdd.setOnAction(handleAdd);
 		
 	}
 	
@@ -179,72 +183,62 @@ public class JSApp_JFX extends Application{
 	
 	private void viewByCat() {
 		String outputPark = String.format("%-10s %-30s %-25s %-30s\n", "ID","NAME","CATEGORY", "SEAVIEW");
+		outputPark += Helper.line(80, "=") + "\n";
 		String outputPC = String.format("%-10s %-30s %-25s %-30s\n", "ID","NAME","CATEGORY", "DISTANCE");
+		outputPC += Helper.line(80, "=") + "\n";
 		String outputStadium = "";
 		String output = "";
-		int choice = Helper.readInt("Enter Jogging Spot Category > ");
-		boolean pFound = false;
-		boolean pcFound = false;
-		boolean sFound = false;
+		
+//		boolean pFound = false;
+//		boolean pcFound = false;
+//		boolean sFound = false;
+		
 		for (JoggingSpot js : jsList) {
-			if (choice == 1) {
+			if (checkPark.isSelected()) {
 				if(js instanceof Park) {
 					Park p = (Park)js;
 					outputPark += p.display();
-					pFound = true;
+//					pFound = true;
+					taResults.setText(outputPark);
 			}
 			}
-			else if (choice == 2) {
+			else if (checkPC.isSelected()) {
 			if(js instanceof ParkConnector) {
 				ParkConnector pc = (ParkConnector)js;
 				outputPC += pc.display();
-				pcFound = true;
+//				pcFound = true;
+				taResults.setText(outputPC);
 			}
 			}
-			else if (choice == 3) {
+			else if (checkStadium.isSelected()) {
 			if(js instanceof Stadium) {
 				Stadium s = (Stadium)js;
 				outputStadium += s.display();
 				outputStadium += "\n" + s.announceUnavailability(s.getId());
 				outputStadium += "\n" ;
-				sFound =true;
+//				sFound =true;
+				taResults.setText(outputStadium);
 			}
 			}
-		}
-		if (pFound == true) {
-			Helper.line(80,"-");
-			System.out.println(outputPark);
-		}else if (pcFound == true) {
-			Helper.line(80,"-");
-			System.out.println(outputPC);
-		}else if (sFound == true) {
-			Helper.line(80,"-");
-			System.out.println(outputStadium);
-		}else {
-			System.out.println("The category is not found.");
-		}
-	}
-	private void showPark() {
-		String outputPark = String.format("%-10s %-30s %-25s %-30s\n", "ID","NAME","CATEGORY", "SEAVIEW");
-		for (JoggingSpot js : jsList) {
-			if(js instanceof Park) {
-				Park p = (Park)js;
-				outputPark += p.display();
+			else {
+				taResults.setText(viewAll());
 			}
 		}
-		taResults.setText(outputPark);
+//		if (pFound == true) {
+//			output+= outputPark;
+////			taResults.setText(output);
+//		}else if (pcFound == true) {
+//			output+=outputPC;
+////			taResults.setText(output);
+//		}else if (sFound == true) {
+//			output+=outputStadium;
+////			taResults.setText(output);
+//		}
+//		else {
+//		taResults.setText(viewAll());
+//		}
 	}
 	
-	public String getNewID() {
-		String lastID = jsList.get(jsList.size()-1).getId();
-		int hasSeaview = 0;
-		int rowsAffected = 0;
-		
-		//used to increment the ID then add back together with the letter J
-		String letterID = lastID.substring(0,1);
-		int numID = Integer.parseInt(lastID.substring(1));
-		numID++;
-		return letterID + numID;
-	}
+
 	
 }
