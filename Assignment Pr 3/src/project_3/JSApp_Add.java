@@ -40,6 +40,7 @@ public class JSApp_Add extends Application {
 	private ArrayList<JoggingSpot> jsList = new ArrayList<JoggingSpot>();
 	
 	private ToggleGroup RBgroup = new ToggleGroup();
+	private ToggleGroup YNgroup = new ToggleGroup();
 
 	private VBox vbPane = new VBox();
 	private HBox RBPane = new HBox();
@@ -56,6 +57,7 @@ public class JSApp_Add extends Application {
 	private RadioButton RBStadium= new RadioButton("Stadium");
 	private RadioButton Yseaview = new RadioButton("Yes");
 	private RadioButton Nseaview = new RadioButton("No");
+	
 	
 	private TextField tfName = new TextField();
 	private TextField tfDistance = new TextField();
@@ -77,7 +79,6 @@ public class JSApp_Add extends Application {
 		String password = "";
 	
 		DBUtil.init(connectionString, userid, password);
-		load();
 		
 		lbWelcome.setFont(Font.font("Arial",15));
 		
@@ -87,10 +88,8 @@ public class JSApp_Add extends Application {
             	parkTf();
             } else if (newValue.equals(RBPC)) {
             	pcTf();
-//            	System.out.println("one");
             } else if(newValue.equals(RBStadium)) {
             	stadiumTf();
-//            	System.out.println("one");
             }
         });
 		
@@ -122,51 +121,68 @@ public class JSApp_Add extends Application {
 		String sql = "";
 		//get the last used ID to generate a new ID for new INSERT
 //		String lastID = jsList.get(jsList.size()-1).getId();
-		int hasSeaview = 0;
 		int rowsAffected = 0;
 
 		String newID = getNewID();
 		
 		String name = tfName.getText();
-
-			if (RBPark.isSelected()) {
-				if (Yseaview.isSelected()) {
-					hasSeaview = 1;
-				}
-				else {
-					hasSeaview = 0;
-				}
-				sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
-						+ "VALUES ('" + newID + "' ,'"+ name + "', '" + "Park" + "', '"+ hasSeaview +"'," + null+ "," + null + ")";
-				rowsAffected = DBUtil.execSQL(sql);
+		
+			if (RBPark.isSelected()&& !tfName.getText().isBlank()&& (Yseaview.isSelected()|| Nseaview.isSelected())) {
+					int hasSeaview = 0;
+					String sqlPark = "";
+					int rowsAffectedPark = 0;
+		            if (Yseaview.isSelected()) {
+		            	hasSeaview = 1;
+		            } 
+		            else if (Nseaview.isSelected()) {
+		            	hasSeaview = 0;
+		            } 
+		            sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
+							+ "VALUES ('" + newID + "' ,'"+ name + "', '" + "Park" + "', '"+ hasSeaview +"'," + null+ "," + null + ")";
+					rowsAffected = DBUtil.execSQL(sql);
 			}
-			else if (RBPC.isSelected()) {
+			if (RBPC.isSelected()&& !tfName.getText().isBlank()&& !tfDistance.getText().isBlank()) {
 				String distance = tfDistance.getText();
-				if(distance.matches("\\d{1,3}(\\.(\\d){1,2})")) {
+				if(distance.matches("\\d{1,3}(\\.(\\d){1,2})?")) {
 				sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
 						+ "VALUES ('" + newID + "' ,'"+ name + "', '" + "Park Connector" + "', "+ null +", '" + Double.parseDouble(distance) + "',"+ null + ")";
 				rowsAffected = DBUtil.execSQL(sql);
+				if (rowsAffected == 1) {
+					status.setText("Jogging Spot Added!");
+				} else {
+					status.setText("Insert failed!");
+				}
 				}
 			}
-			else if (RBStadium.isSelected()) {
+			if (RBStadium.isSelected()&& !tfName.getText().isBlank() && !tfClosingTime.getText().isBlank()) {
 				String ct = tfClosingTime.getText();
 				LocalTime closeTime = LocalTime.parse(ct);
 				sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
 						+ "VALUES ('" + newID + "' ,'" + name + "', '" + "Stadium" + "'," + null + "," + null + ",'" + closeTime + "'" + ")";
 				rowsAffected = DBUtil.execSQL(sql);
+				if (rowsAffected == 1) {
+					status.setText("Jogging Spot Added!");
+				} else {
+					status.setText("Insert failed!");
+				}
 				
 			}
+			if (rowsAffected == 1) {
+				status.setText("Jogging Spot Added!");
+			} else {
+				status.setText("Insert failed! Ensure all fields are filled!");
+			}
 		
-		if (rowsAffected == 1) {
-			status.setText("Jogging Spot Added!");
-		} else {
-			status.setText("Insert failed!");
-		}
+	
 	}
 	
 	private void parkTf() {
 		vbPane.getChildren().removeAll(lbDistance,tfDistance,lbClosingTime,tfClosingTime,btAdd,status);
 		vbPane.getChildren().addAll(lbSeaview,Yseaview,Nseaview,btAdd,status);
+		Yseaview.setToggleGroup(YNgroup);
+	    Yseaview.setSelected(true);
+	    Nseaview.setToggleGroup(YNgroup);
+
 	}
 	private void pcTf() {
 		vbPane.getChildren().removeAll(lbSeaview,Yseaview,Nseaview,lbClosingTime,tfClosingTime,btAdd,status);
@@ -206,9 +222,9 @@ public class JSApp_Add extends Application {
 		}
 	}
 	private String getNewID() {
+		jsList.clear();
+		load();
 		String lastID = jsList.get(jsList.size()-1).getId();
-		int hasSeaview = 0;
-		int rowsAffected = 0;
 		
 		//used to increment the ID then add back together with the letter J
 		String letterID = lastID.substring(0,1);
@@ -216,4 +232,5 @@ public class JSApp_Add extends Application {
 		numID++;
 		return letterID + numID;
 	}
+
 }

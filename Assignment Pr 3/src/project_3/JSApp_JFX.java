@@ -15,6 +15,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -24,8 +26,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -40,7 +44,6 @@ public class JSApp_JFX extends Application{
 	private VBox vbPane = new VBox();
 	private HBox hbPane = new HBox();
 	private HBox hbPaneCheck = new HBox();
-	
 	//Display the title
 	private Label lbAppTitleWelcome = new Label("Welcome to the Jogging Spots App!");
 	
@@ -49,10 +52,10 @@ public class JSApp_JFX extends Application{
 	private CheckBox checkStadium = new CheckBox("Stadium");
 	
 	//4 buttons for the app
-	private Button btView = new Button("View All Jogging Spots");
 	private Button btAdd = new Button("Add Jogging Spots");
 	private Button btEdit = new Button("Edit Jogging Spots Details");
 	private Button btDelete = new Button("Delete Jogging Spots");
+	private Button btGen = new Button("Generate!");
 
 	//textbox used to display things
 	private TextArea taResults = new TextArea();
@@ -81,7 +84,8 @@ public class JSApp_JFX extends Application{
 		hbPane.setSpacing(10);
 		hbPane.setAlignment(Pos.CENTER);
 		// include the buttons in the horizontal pane
-		hbPane.getChildren().addAll(btView,btAdd,btEdit,btDelete);
+		hbPane.getChildren().addAll(btAdd,btEdit,btDelete);
+		
 		hbPaneCheck.getChildren().addAll(checkPark,checkPC,checkStadium);
 		hbPaneCheck.setSpacing(15);
 		hbPaneCheck.setAlignment(Pos.CENTER);
@@ -92,14 +96,16 @@ public class JSApp_JFX extends Application{
 		vbPane.setPadding(new Insets(10,10,10,10));
 		vbPane.setAlignment(Pos.TOP_CENTER);
 		taResults.setPrefHeight(400);
-		lbAppTitleWelcome.setFont(Font.font("Consolas", 15));
+		lbAppTitleWelcome.setFont(Font.font("Helvetica", 20));
 		// include all elements in the vertical pane
 		taResults.setText(viewAll());
 		taResults.setFont(Font.font("Consolas",15));
-		vbPane.getChildren().addAll(lbAppTitleWelcome,hbPane,hbPaneCheck,taResults);
+		vbPane.getChildren().addAll(lbAppTitleWelcome,hbPane,hbPaneCheck,btGen,taResults);
 		
 		// create scene to display within the stage(skeleton)
+		
 		Scene mainScene = new Scene(vbPane);
+		mainScene.setFill(Color.DARKGREEN);
 		primaryStage.setScene(mainScene);
 		
 		// create the stage (skeleton for the app)
@@ -109,14 +115,9 @@ public class JSApp_JFX extends Application{
 		
 		// display the app window, the GUI
 		primaryStage.show();
-		
-		EventHandler<ActionEvent> handleView = (ActionEvent e) -> viewAll();
-		btView.setOnAction(handleView);
-		
-		EventHandler<ActionEvent> handleShowSpot = (ActionEvent e) -> viewByCat();
-		checkPark.setOnAction(handleShowSpot);
-		checkPC.setOnAction(handleShowSpot);
-		checkStadium.setOnAction(handleShowSpot);
+
+		EventHandler<ActionEvent> handleViewByCat = (ActionEvent e) -> viewByCat(checkPark,checkPC,checkStadium);
+		btGen.setOnAction(handleViewByCat);
 		
 		EventHandler<ActionEvent> handleAdd = (ActionEvent e) -> (new JSApp_Add()).start(new Stage());
 		btAdd.setOnAction(handleAdd);
@@ -155,6 +156,8 @@ public class JSApp_JFX extends Application{
 	}
 	
 	private String viewAll() {
+		jsList.clear();
+		load();
 		String outputPark = String.format("%-10s %-30s %-25s %-30s\n", "ID","NAME","CATEGORY", "SEAVIEW");
 		outputPark += Helper.line(80, "=") + "\n";
 		String outputPC = String.format("\n%-10s %-30s %-25s %-30s\n", "ID","NAME","CATEGORY", "DISTANCE");
@@ -174,14 +177,14 @@ public class JSApp_JFX extends Application{
 				outputStadium += s.display();
 				outputStadium += "\n" + s.announceUnavailability(s.getId());
 				outputStadium += "\n" ;
-				
 			}
 		}
 		return outputPark + outputPC + outputStadium;
-		
 	}
 	
-	private void viewByCat() {
+	private void viewByCat(CheckBox checkPark,CheckBox checkPC,CheckBox checkStadium) {
+		jsList.clear();
+		load();
 		String outputPark = String.format("%-10s %-30s %-25s %-30s\n", "ID","NAME","CATEGORY", "SEAVIEW");
 		outputPark += Helper.line(80, "=") + "\n";
 		String outputPC = String.format("%-10s %-30s %-25s %-30s\n", "ID","NAME","CATEGORY", "DISTANCE");
@@ -189,56 +192,42 @@ public class JSApp_JFX extends Application{
 		String outputStadium = "";
 		String output = "";
 		
-//		boolean pFound = false;
-//		boolean pcFound = false;
-//		boolean sFound = false;
-		
-		for (JoggingSpot js : jsList) {
 			if (checkPark.isSelected()) {
+				for (JoggingSpot js : jsList) {
 				if(js instanceof Park) {
 					Park p = (Park)js;
-					outputPark += p.display();
-//					pFound = true;
-					taResults.setText(outputPark);
+					outputPark += p.display();	
+					}
+				}
+				output+=outputPark;
 			}
+			if (checkPC.isSelected()) {
+				for (JoggingSpot js : jsList) {
+				if(js instanceof ParkConnector) {
+					ParkConnector pc = (ParkConnector)js;
+					outputPC += pc.display();
+					
+					}
+				}
+				output+=outputPC;
 			}
-			else if (checkPC.isSelected()) {
-			if(js instanceof ParkConnector) {
-				ParkConnector pc = (ParkConnector)js;
-				outputPC += pc.display();
-//				pcFound = true;
-				taResults.setText(outputPC);
+			if (checkStadium.isSelected()) {
+				for (JoggingSpot js : jsList) {
+				if(js instanceof Stadium) {
+					Stadium s = (Stadium)js;
+					outputStadium += s.display();
+					outputStadium += "\n" + s.announceUnavailability(s.getId());
+					outputStadium += "\n" ;
+					}
+				}
+				output+=outputStadium;
 			}
-			}
-			else if (checkStadium.isSelected()) {
-			if(js instanceof Stadium) {
-				Stadium s = (Stadium)js;
-				outputStadium += s.display();
-				outputStadium += "\n" + s.announceUnavailability(s.getId());
-				outputStadium += "\n" ;
-//				sFound =true;
-				taResults.setText(outputStadium);
-			}
-			}
-			else {
-				taResults.setText(viewAll());
-			}
+		
+		if(!checkPark.isSelected() && !checkPC.isSelected() && !checkStadium.isSelected()) {
+			output=viewAll();
 		}
-//		if (pFound == true) {
-//			output+= outputPark;
-////			taResults.setText(output);
-//		}else if (pcFound == true) {
-//			output+=outputPC;
-////			taResults.setText(output);
-//		}else if (sFound == true) {
-//			output+=outputStadium;
-////			taResults.setText(output);
-//		}
-//		else {
-//		taResults.setText(viewAll());
-//		}
+		taResults.setText(output);
 	}
 	
-
-	
+		
 }

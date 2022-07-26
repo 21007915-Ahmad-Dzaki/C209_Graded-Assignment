@@ -31,9 +31,9 @@ public class Park extends JoggingSpot {
 		String have = "";
 		String outputPark = "";
 		if(seaview) {
-			have = "yes";
+			have = "Yes";
 		}else {
-			have = "no";
+			have = "No";
 		}
 		outputPark += String.format("%-10s %-30s %-25s %-30s\n", getId(),getName(),getCategory(), have);
 		return outputPark;
