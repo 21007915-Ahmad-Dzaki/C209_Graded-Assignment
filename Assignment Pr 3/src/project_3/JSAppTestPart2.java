@@ -250,6 +250,10 @@ public class JSAppTestPart2 {
 		
 		String name = Helper.readString("Enter name >");
 		
+		for (JoggingSpot js: jsList) {
+			
+		}
+		
 		String sql = "DELETE from jogging_spot WHERE Name = '" + name + "'";
 		int rowsAffected = DBUtil.execSQL(sql);
 		

@@ -74,6 +74,7 @@ public class JSApp_Add extends Application {
 		launch(args);
 	}
 	public void start(Stage primaryStage) {
+		//declare connectionString,user,pass for SQL connection
 		String connectionString = "jdbc:mysql://localhost:3306/assignment_pr_3";
 		String userid = "root";
 		String password = "";
