@@ -11,6 +11,7 @@ package project_3;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
@@ -21,6 +22,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -45,6 +47,7 @@ public class JSApp_Add extends Application {
 
 	private VBox vbPane = new VBox();
 	private HBox RBPane = new HBox();
+	private HBox timePane = new HBox();
 	
 	private Label lbWelcome = new Label("           Jogging Spot\nAdding new Jogging Spot");
 	private Label lbName = new Label("Name");
@@ -59,10 +62,13 @@ public class JSApp_Add extends Application {
 	private RadioButton Yseaview = new RadioButton("Yes");
 	private RadioButton Nseaview = new RadioButton("No");
 	
+	private ComboBox<Integer> hour = new ComboBox();
+	private ComboBox<Integer> min = new ComboBox();
 	
 	private TextField tfName = new TextField();
 	private TextField tfDistance = new TextField();
-	private TextField tfClosingTime = new TextField();
+	private int hourValue;
+	private int minValue;
 	
 	private Label status = new Label();
 	
@@ -83,8 +89,16 @@ public class JSApp_Add extends Application {
 		DBUtil.init(JDBC_URL, DB_USERNAME, DB_PASSWORD);
 		
 		lbWelcome.setFont(Font.font("Arial",15));
-		
+		RBPark.setSelected(true);
 		RBgroup.getToggles().addAll(RBPark,RBPC,RBStadium);
+		
+		for (int i = 0; i<24;i++) {
+			hour.getItems().add(i);
+		}
+		for (int i = 0; i<61;i++) {
+			min.getItems().add(i);
+		}
+
 		
 		RBgroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.equals(RBPark)) {
@@ -102,6 +116,10 @@ public class JSApp_Add extends Application {
 		RBPane.getChildren().addAll(RBPark,RBPC,RBStadium);
 		RBPane.setAlignment(Pos.CENTER);
 		
+		timePane.getChildren().addAll(hour,min);
+		timePane.setAlignment(Pos.CENTER);
+		timePane.setSpacing(10);
+		
 		vbPane.getChildren().addAll(lbWelcome,lbName,tfName,lbCat,RBPane);
 		vbPane.setAlignment(Pos.TOP_CENTER);
 		vbPane.setSpacing(10);
@@ -118,6 +136,20 @@ public class JSApp_Add extends Application {
 		EventHandler<ActionEvent> handleAdd = (ActionEvent e) -> addJS();
 		btAdd.setOnAction(handleAdd);
 		
+		hour.setOnAction((event) -> {
+		    int selectedIndex = hour.getSelectionModel().getSelectedIndex();
+		    Object selectedItem = hour.getSelectionModel().getSelectedItem();
+		    hourValue = hour.getValue(); //get value and convert to string
+		});
+		
+		min.setOnAction((event) -> {
+		    int selectedIndex = min.getSelectionModel().getSelectedIndex();
+		    Object selectedItem = min.getSelectionModel().getSelectedItem();
+		    minValue = min.getValue(); //get value and convert to string
+		});
+		LocalTime closeTime = LocalTime.of(hourValue, minValue);
+		System.out.println(closeTime);
+		
 	}
 	private void addJS(){
 		
@@ -132,8 +164,6 @@ public class JSApp_Add extends Application {
 		
 			if (RBPark.isSelected()&& !tfName.getText().isBlank()&& (Yseaview.isSelected()|| Nseaview.isSelected())) {
 					int hasSeaview = 0;
-					String sqlPark = "";
-					int rowsAffectedPark = 0;
 		            if (Yseaview.isSelected()) {
 		            	hasSeaview = 1;
 		            } 
@@ -150,24 +180,16 @@ public class JSApp_Add extends Application {
 				sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
 						+ "VALUES ('" + newID + "' ,'"+ name + "', '" + "Park Connector" + "', "+ null +", '" + Double.parseDouble(distance) + "',"+ null + ")";
 				rowsAffected = DBUtil.execSQL(sql);
-				if (rowsAffected == 1) {
-					status.setText("Jogging Spot Added!");
-				} else {
-					status.setText("Insert failed!");
-				}
+				
 				}
 			}
-			if (RBStadium.isSelected()&& !tfName.getText().isBlank() && !tfClosingTime.getText().isBlank()) {
-				String ct = tfClosingTime.getText();
-				LocalTime closeTime = LocalTime.parse(ct);
+			if (RBStadium.isSelected()&& !tfName.getText().isBlank()) {
+				LocalTime closeTime = LocalTime.of(hourValue, minValue);
+				System.out.println(closeTime);
 				sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
 						+ "VALUES ('" + newID + "' ,'" + name + "', '" + "Stadium" + "'," + null + "," + null + ",'" + closeTime + "'" + ")";
 				rowsAffected = DBUtil.execSQL(sql);
-				if (rowsAffected == 1) {
-					status.setText("Jogging Spot Added!");
-				} else {
-					status.setText("Insert failed!");
-				}
+			
 				
 			}
 			if (rowsAffected == 1) {
@@ -180,20 +202,19 @@ public class JSApp_Add extends Application {
 	}
 	
 	private void parkTf() {
-		vbPane.getChildren().removeAll(lbDistance,tfDistance,lbClosingTime,tfClosingTime,btAdd,status);
+		vbPane.getChildren().removeAll(lbDistance,tfDistance,lbClosingTime,timePane,btAdd,status);
 		vbPane.getChildren().addAll(lbSeaview,Yseaview,Nseaview,btAdd,status);
 		Yseaview.setToggleGroup(YNgroup);
 	    Yseaview.setSelected(true);
 	    Nseaview.setToggleGroup(YNgroup);
-
 	}
 	private void pcTf() {
-		vbPane.getChildren().removeAll(lbSeaview,Yseaview,Nseaview,lbClosingTime,tfClosingTime,btAdd,status);
+		vbPane.getChildren().removeAll(lbSeaview,Yseaview,Nseaview,lbClosingTime,timePane,btAdd,status);
 		vbPane.getChildren().addAll(lbDistance,tfDistance,btAdd,status);
 	}
 	private void stadiumTf() {
 		vbPane.getChildren().removeAll(lbSeaview,Yseaview,Nseaview,lbDistance,tfDistance,btAdd,status);
-		vbPane.getChildren().addAll(lbClosingTime,tfClosingTime,btAdd,status);
+		vbPane.getChildren().addAll(lbClosingTime,timePane,btAdd,status);
 	}
 	private void load() {
 		try {
