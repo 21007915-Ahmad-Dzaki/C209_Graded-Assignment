@@ -28,6 +28,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.InputMethodEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -66,6 +67,10 @@ public class JSApp_Add extends Application {
 	private Label status = new Label();
 	
 	private Button btAdd = new Button("Add Jogging Spot");
+	
+	private static final String JDBC_URL ="jdbc:mysql://localhost:3306/assignment_pr_3";
+	private static final String DB_USERNAME = "root";
+	private static final String DB_PASSWORD = "";
 	/**
 	 * @param args
 	 */
@@ -75,15 +80,12 @@ public class JSApp_Add extends Application {
 	}
 	public void start(Stage primaryStage) {
 		//declare connectionString,user,pass for SQL connection
-		String connectionString = "jdbc:mysql://localhost:3306/assignment_pr_3";
-		String userid = "root";
-		String password = "";
-	
-		DBUtil.init(connectionString, userid, password);
+		DBUtil.init(JDBC_URL, DB_USERNAME, DB_PASSWORD);
 		
 		lbWelcome.setFont(Font.font("Arial",15));
 		
 		RBgroup.getToggles().addAll(RBPark,RBPC,RBStadium);
+		
 		RBgroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.equals(RBPark)) {
             	parkTf();
