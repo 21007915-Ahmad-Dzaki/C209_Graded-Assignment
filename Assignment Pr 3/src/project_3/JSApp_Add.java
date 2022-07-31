@@ -62,8 +62,8 @@ public class JSApp_Add extends Application {
 	private RadioButton Yseaview = new RadioButton("Yes");
 	private RadioButton Nseaview = new RadioButton("No");
 	
-	private ComboBox<Integer> hour = new ComboBox();
-	private ComboBox<Integer> min = new ComboBox();
+	private ComboBox<Integer> hour = new ComboBox<Integer>();
+	private ComboBox<Integer> min = new ComboBox<Integer>();
 	
 	private TextField tfName = new TextField();
 	private TextField tfDistance = new TextField();
@@ -99,7 +99,6 @@ public class JSApp_Add extends Application {
 			min.getItems().add(i);
 		}
 
-		
 		RBgroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.equals(RBPark)) {
             	parkTf();
@@ -109,7 +108,6 @@ public class JSApp_Add extends Application {
             	stadiumTf();
             }
         });
-		
 		
 		RBPark.setPrefWidth(70);
 		RBPC.setPrefWidth(130);
@@ -137,68 +135,60 @@ public class JSApp_Add extends Application {
 		btAdd.setOnAction(handleAdd);
 		
 		hour.setOnAction((event) -> {
-		    int selectedIndex = hour.getSelectionModel().getSelectedIndex();
-		    Object selectedItem = hour.getSelectionModel().getSelectedItem();
 		    hourValue = hour.getValue(); //get value and convert to string
 		});
 		
 		min.setOnAction((event) -> {
-		    int selectedIndex = min.getSelectionModel().getSelectedIndex();
-		    Object selectedItem = min.getSelectionModel().getSelectedItem();
 		    minValue = min.getValue(); //get value and convert to string
 		});
-		LocalTime closeTime = LocalTime.of(hourValue, minValue);
-		System.out.println(closeTime);
-		
 	}
 	private void addJS(){
 		
 		String sql = "";
-		//get the last used ID to generate a new ID for new INSERT
-//		String lastID = jsList.get(jsList.size()-1).getId();
+
 		int rowsAffected = 0;
 
 		String newID = getNewID();
 		
 		String name = tfName.getText();
 		
-			if (RBPark.isSelected()&& !tfName.getText().isBlank()&& (Yseaview.isSelected()|| Nseaview.isSelected())) {
-					int hasSeaview = 0;
-		            if (Yseaview.isSelected()) {
-		            	hasSeaview = 1;
-		            } 
-		            else if (Nseaview.isSelected()) {
-		            	hasSeaview = 0;
-		            } 
-		            sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
-							+ "VALUES ('" + newID + "' ,'"+ name + "', '" + "Park" + "', '"+ hasSeaview +"'," + null+ "," + null + ")";
-					rowsAffected = DBUtil.execSQL(sql);
-			}
-			if (RBPC.isSelected()&& !tfName.getText().isBlank()&& !tfDistance.getText().isBlank()) {
-				String distance = tfDistance.getText();
-				if(distance.matches("\\d{1,3}(\\.(\\d){1,2})?")) {
+		if (RBPark.isSelected()&& !tfName.getText().isBlank()&& (Yseaview.isSelected()|| Nseaview.isSelected())) {
+			int hasSeaview = 0;
+			if (Yseaview.isSelected()) {
+				hasSeaview = 1;
+			} 
+			else if (Nseaview.isSelected()) {
+				hasSeaview = 0;
+			} 
+			sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
+					+ "VALUES ('" + newID + "' ,'"+ name + "', '" + "Park" + "', '"+ hasSeaview +"'," + null+ "," + null + ")";
+			rowsAffected = DBUtil.execSQL(sql);
+		}
+		if (RBPC.isSelected()&& !tfName.getText().isBlank()&& !tfDistance.getText().isBlank()) {
+			String distance = tfDistance.getText();
+			if(distance.matches("\\d{1,3}(\\.(\\d){1,2})?")) {
 				sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
 						+ "VALUES ('" + newID + "' ,'"+ name + "', '" + "Park Connector" + "', "+ null +", '" + Double.parseDouble(distance) + "',"+ null + ")";
 				rowsAffected = DBUtil.execSQL(sql);
-				
-				}
+
 			}
-			if (RBStadium.isSelected()&& !tfName.getText().isBlank()) {
-				LocalTime closeTime = LocalTime.of(hourValue, minValue);
-				System.out.println(closeTime);
-				sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
-						+ "VALUES ('" + newID + "' ,'" + name + "', '" + "Stadium" + "'," + null + "," + null + ",'" + closeTime + "'" + ")";
-				rowsAffected = DBUtil.execSQL(sql);
-			
-				
-			}
-			if (rowsAffected == 1) {
-				status.setText("Jogging Spot Added!");
-			} else {
-				status.setText("Insert failed! Ensure all fields are filled!");
-			}
-		
-	
+		}
+		if (RBStadium.isSelected()&& !tfName.getText().isBlank()) {
+			LocalTime closeTime = LocalTime.of(hourValue, minValue);
+			System.out.println(closeTime);
+			sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
+					+ "VALUES ('" + newID + "' ,'" + name + "', '" + "Stadium" + "'," + null + "," + null + ",'" + closeTime + "'" + ")";
+			rowsAffected = DBUtil.execSQL(sql);
+
+
+		}
+		if (rowsAffected == 1) {
+			status.setText("Jogging Spot Added!");
+		} else {
+			status.setText("Insert failed! Ensure all fields are filled!");
+		}
+
+
 	}
 	
 	private void parkTf() {

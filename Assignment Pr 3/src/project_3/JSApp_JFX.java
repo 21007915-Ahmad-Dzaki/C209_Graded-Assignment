@@ -35,6 +35,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import tests.JSApp_FindJS;
 
 /**
  * @author ahmad
@@ -46,11 +47,11 @@ public class JSApp_JFX extends Application{
 	private VBox vbPane = new VBox();
 	private HBox hbPane = new HBox();
 	private HBox hbPaneCheck = new HBox();
+	private HBox hbPaneView = new HBox();
 	//Display the title
 	private Label lbAppTitleWelcome = new Label("Welcome to the Jogging Spots App!");
 	private Label lbViewByCat = new Label("View By Category");
-	private Label lbSearchName = new Label("Search By Name");
-	private TextField tfSearch = new TextField();
+	private Label lbJS = new Label("Jogging Spots:");
 	
 	private CheckBox checkPark = new CheckBox("Park");
 	private CheckBox checkPC = new CheckBox("Park Connector");
@@ -58,10 +59,10 @@ public class JSApp_JFX extends Application{
 	
 	//4 buttons for the app
 	private Button btViewAll = new Button("View All");
+	private Button btDeselectAll = new Button("Deselect All");
 	private Button btAdd = new Button("Add Jogging Spots");
-	private Button btEdit = new Button("Edit Jogging Spots Details");
-	private Button btDelete = new Button("Delete Jogging Spots");
-	private Button btSearch = new Button("Search");
+	private Button btDel = new Button("Delete Jogging Spot");
+	private Button btEdit = new Button("Edit Jogging Spot");
 
 	//textbox used to display things
 	private TextArea taResults = new TextArea();
@@ -90,7 +91,11 @@ public class JSApp_JFX extends Application{
 		hbPane.setSpacing(10);
 		hbPane.setAlignment(Pos.CENTER);
 		// include the buttons in the horizontal pane
-		hbPane.getChildren().addAll(btAdd,btEdit,btDelete);
+		hbPane.getChildren().addAll(btAdd,btDel);
+		
+		hbPaneView.getChildren().addAll(btViewAll,btDeselectAll);
+		hbPaneView.setAlignment(Pos.CENTER);
+		hbPaneView.setSpacing(10);
 		
 		hbPaneCheck.getChildren().addAll(checkPark,checkPC,checkStadium);
 		hbPaneCheck.setSpacing(15);
@@ -106,13 +111,13 @@ public class JSApp_JFX extends Application{
 		lbAppTitleWelcome.setFont(Font.font("Verdana",FontWeight.BOLD, 20));
 		lbViewByCat.setFont(Font.font("Verdana",FontWeight.MEDIUM,15));
 		lbViewByCat.setTextFill(Color.DARKCYAN);
-		lbSearchName.setFont(Font.font("Verdana",FontWeight.MEDIUM,15));
-		lbSearchName.setTextFill(Color.DARKCYAN);
+		lbJS.setFont(Font.font("Brush Script MT",FontWeight.MEDIUM,25));
+		lbJS.setTextFill(Color.DARKCYAN);
 		
 		// include all elements in the vertical pane
 		
 		taResults.setFont(Font.font("Consolas",15));
-		vbPane.getChildren().addAll(lbAppTitleWelcome,hbPane,lbViewByCat,hbPaneCheck,btViewAll,lbSearchName,tfSearch,btSearch,taResults);
+		vbPane.getChildren().addAll(lbAppTitleWelcome,hbPane,lbViewByCat,hbPaneCheck,hbPaneView,lbJS,taResults);
 		
 		// create scene to display within the stage(skeleton)
 		
@@ -122,7 +127,7 @@ public class JSApp_JFX extends Application{
 		primaryStage.setScene(mainScene);
 		primaryStage.setTitle("Jogging Spot App");
 		primaryStage.setWidth(900);
-		primaryStage.setHeight(750);
+		primaryStage.setHeight(700);
 		
 		// display the app window, the GUI
 		primaryStage.show();
@@ -135,11 +140,20 @@ public class JSApp_JFX extends Application{
 		EventHandler<ActionEvent> handleAdd = (ActionEvent e) -> (new JSApp_Add()).start(new Stage());
 		btAdd.setOnAction(handleAdd);
 		
-		EventHandler<ActionEvent> handleSearch = (ActionEvent e) -> search();
-		btSearch.setOnAction(handleSearch);
-		
 		EventHandler<ActionEvent> handleViewAll = (ActionEvent e) -> viewAll();
 		btViewAll.setOnAction(handleViewAll);
+		
+		EventHandler<ActionEvent> handleDeselect = (ActionEvent e) -> {
+			checkPark.setSelected(false);
+			checkPC.setSelected(false);
+			checkStadium.setSelected(false);
+			taResults.clear();
+		};
+		btDeselectAll.setOnAction(handleDeselect);
+		
+		EventHandler<ActionEvent> handleDel = (ActionEvent e) -> (new JSApp_Del()).start(new Stage());
+		btDel.setOnAction(handleDel);
+		
 	}
 	
 	// create the load method to store sql query into ArrayList
@@ -247,42 +261,6 @@ public class JSApp_JFX extends Application{
 		if(!checkPark.isSelected() && !checkPC.isSelected() && !checkStadium.isSelected()) {
 			output="";
 		}
-		taResults.setText(output);
-	}
-	private void search() {
-		checkPark.setSelected(false);
-		checkPC.setSelected(false);
-		checkStadium.setSelected(false);
-		jsList.clear();
-		load();
-		String outputPark = "";
-		String outputPC = "";
-		String outputStadium = "";
-		String output = "";
-		tfSearch.getText();
-		
-		for (JoggingSpot js : jsList) {
-			if(js.getName().contains(tfSearch.getText())&& js instanceof Park) {
-				outputPark += String.format("%-10s %-30s %-25s %-30s\n", "ID","NAME","CATEGORY", "SEAVIEW");
-				outputPark += Helper.line(80, "=") + "\n";
-				Park p = (Park)js;
-				outputPark += p.display() + "\n";
-			}
-			
-			else if(js.getName().contains(tfSearch.getText())&& js instanceof ParkConnector) {
-				outputPC += String.format("\n%-10s %-30s %-25s %-30s\n", "ID","NAME","CATEGORY", "DISTANCE");
-				outputPC += Helper.line(80, "=") + "\n";
-				ParkConnector pc = (ParkConnector)js;
-				outputPC += pc.display() + "\n";
-			}
-			else if(js.getName().contains(tfSearch.getText())&&js instanceof Stadium) {
-				Stadium s = (Stadium)js;
-				outputStadium += s.display();
-				outputStadium += "\n" + s.announceUnavailability(s.getId());
-				outputStadium += "\n" ;
-			}
-		}
-		output += outputPark + outputPC + outputStadium;
 		taResults.setText(output);
 	}
 		

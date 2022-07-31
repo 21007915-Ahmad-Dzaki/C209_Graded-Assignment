@@ -69,7 +69,7 @@ public class JSAppTestPart2 {
 		System.out.println("2. View Jogging Spots by Category");
 		System.out.println("3. Add Jogging Spot");
 		System.out.println("4. Delete Jogging Spot");
-		System.out.println("4. Quit");
+		System.out.println("5. Quit");
 	}
 	
 	private void menuCat() {
