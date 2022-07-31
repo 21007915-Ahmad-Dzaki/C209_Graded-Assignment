@@ -35,7 +35,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import tests.JSApp_FindJS;
+import tests.JSApp_Del;
 
 /**
  * @author ahmad
@@ -61,8 +61,7 @@ public class JSApp_JFX extends Application{
 	private Button btViewAll = new Button("View All");
 	private Button btDeselectAll = new Button("Deselect All");
 	private Button btAdd = new Button("Add Jogging Spots");
-	private Button btDel = new Button("Delete Jogging Spot");
-	private Button btEdit = new Button("Edit Jogging Spot");
+	private Button btFind = new Button("Find Jogging Spot");
 
 	//textbox used to display things
 	private TextArea taResults = new TextArea();
@@ -91,7 +90,7 @@ public class JSApp_JFX extends Application{
 		hbPane.setSpacing(10);
 		hbPane.setAlignment(Pos.CENTER);
 		// include the buttons in the horizontal pane
-		hbPane.getChildren().addAll(btAdd,btDel);
+		hbPane.getChildren().addAll(btAdd,btFind);
 		
 		hbPaneView.getChildren().addAll(btViewAll,btDeselectAll);
 		hbPaneView.setAlignment(Pos.CENTER);
@@ -151,8 +150,8 @@ public class JSApp_JFX extends Application{
 		};
 		btDeselectAll.setOnAction(handleDeselect);
 		
-		EventHandler<ActionEvent> handleDel = (ActionEvent e) -> (new JSApp_Del()).start(new Stage());
-		btDel.setOnAction(handleDel);
+		EventHandler<ActionEvent> handleFind = (ActionEvent e) -> (new JSApp_FindJS()).start(new Stage());
+		btFind.setOnAction(handleFind);
 		
 	}
 	

@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.time.LocalTime;
-import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -47,8 +46,9 @@ public class JSApp_FindJS extends Application{
 	private BorderPane pane = new BorderPane();
 	
 	private Button btDelete = new Button("Delete");
-	private Button btEdit = new Button("Edit Details");
-	private Button btEventDate = new Button ("Add new Event Date");
+	private Button btEdit = new Button("Edit");
+	private Button btEventDate = new Button("Add Event Date");
+	
 	
 	private int index;
 	
@@ -71,57 +71,59 @@ public class JSApp_FindJS extends Application{
 		DBUtil.init(connectionString, userid, password);
 		
 		loadIntoArray();
+		loadList();
 		
 		list.setEditable(false);
 		list.setMaxHeight(150);
-
-		loadList();
+		
 		taResults.setPrefHeight(130);
 		taResults.setFont(Font.font("Consolas",15));
 		
+		//set display when cell is selected
 		list.getSelectionModel().selectedItemProperty().addListener(e -> {
 			btDelete.setVisible(true);
 			btEdit.setVisible(true);
 			index = list.getSelectionModel().getSelectedIndex();
 			if (jsList.get(index) instanceof Park) {
-				btEventDate.setVisible(false);
 				Park p = (Park)jsList.get(index);
 				String outputPark = String.format("%s: %s\n%s: %s\n%s: %s\n", "ID",p.getId(),"NAME",p.getName(),"CATEGORY",p.getCategory());
 				taResults.setText(outputPark);
-				System.out.println(list.getSelectionModel().getSelectedIndex());
+				btEventDate.setVisible(false);
 			}
 			if (jsList.get(index) instanceof ParkConnector) {
-				btEventDate.setVisible(false);
 				ParkConnector pc = (ParkConnector)jsList.get(index);
 				String outputPC = String.format("%s: %s\n%s: %s\n%s: %s\n", "ID",pc.getId(),"NAME",pc.getName(),"CATEGORY",pc.getCategory());
 				taResults.setText(outputPC);
-				System.out.println(list.getSelectionModel().getSelectedIndex());
+				btEventDate.setVisible(false);
 			}
 			if (jsList.get(index) instanceof Stadium) {
-				btEventDate.setVisible(true);
 				Stadium s = (Stadium)jsList.get(index);
 				String outputStadium = String.format("%s: %s\n%s: %s\n%s: %s\n", "ID",s.getId(),"NAME",s.getName(),"CATEGORY",s.getCategory());
 				taResults.setText(outputStadium);
-				System.out.println(list.getSelectionModel().getSelectedIndex());
+				btEventDate.setVisible(true);
 			}
 
 		});
-		
-
+		//buttons visibility
 		btDelete.setVisible(false);
 		btEdit.setVisible(false);
 		btEventDate.setVisible(false);
-
+		
+		//buttons pane
 		hbPane.getChildren().addAll(btDelete,btEdit,btEventDate);
-		hbPane.setAlignment(Pos.CENTER);
 		hbPane.setSpacing(10);
-		vbPane.setSpacing(15);
-		pane.setPadding(new Insets(10,10,10,10));
-
+		hbPane.setAlignment(Pos.CENTER);
+		
+		//pane for bottom of stage
 		vbPane.getChildren().addAll(taResults,hbPane);
+		vbPane.setSpacing(10);
 		vbPane.setAlignment(Pos.CENTER);
+		
+		//positioning the panes, list
 		pane.setTop(list);
 		pane.setCenter(vbPane);
+		pane.setPadding(new Insets(10));
+		
 		Scene mainScene = new Scene(pane);
 		mainStage.setScene(mainScene);
 		mainStage.setTitle("Delete Jogging Spot");
@@ -130,10 +132,16 @@ public class JSApp_FindJS extends Application{
 		mainStage.show();
 		
 		EventHandler<ActionEvent> handleDelete = (ActionEvent e) -> deleteJS();
-		
 		btDelete.setOnAction(handleDelete);
+		
+		EventHandler<ActionEvent> handleEdit = (ActionEvent e) -> {	
+			JSApp_EventDate js = new JSApp_EventDate();
+			js.store(index, jsList);
+			js.start(new Stage());
+		};
+		btEventDate.setOnAction(handleEdit);
 	}
-	private void loadIntoArray() {
+	 public void loadIntoArray() {
 		try {
 			String sql = "SELECT * FROM jogging_spot";
 			ResultSet rs = DBUtil.getTable(sql);
@@ -180,7 +188,7 @@ public class JSApp_FindJS extends Application{
 		
 	}
 	public void deleteJS() {
-		list.refresh();
+		
 		String id =  jsList.get(index).getId();
 
 		String sql = "DELETE from jogging_spot WHERE ID = '" + id + "'";
@@ -194,4 +202,5 @@ public class JSApp_FindJS extends Application{
 			taResults.setText("Delete Failed!");
 		}
 	}
+
 }

@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.time.LocalTime;
-import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -48,11 +47,12 @@ public class JSApp_Del extends Application{
 	ListView<String> list = new ListView<String>();
 	
 	private VBox vbPane = new VBox();
+	private HBox hbPane = new HBox();
 	private BorderPane pane = new BorderPane();
 	
 	private Button btDelete = new Button("Delete");
-	private Button btEdit = new Button("Edit");
-	private Button btEventDate = new Button ("Add new Event Date");
+	
+	private Stage secStage = new Stage();
 	
 	private int index;
 	
@@ -75,14 +75,15 @@ public class JSApp_Del extends Application{
 		DBUtil.init(connectionString, userid, password);
 		
 		loadIntoArray();
+		loadList();
 		
 		list.setEditable(false);
 		list.setMaxHeight(150);
-
-		loadList();
+		
 		taResults.setPrefHeight(130);
 		taResults.setFont(Font.font("Consolas",15));
 		
+		//set display when cell is selected
 		list.getSelectionModel().selectedItemProperty().addListener(e -> {
 			btDelete.setVisible(true);
 			index = list.getSelectionModel().getSelectedIndex();
@@ -104,16 +105,14 @@ public class JSApp_Del extends Application{
 
 		});
 		
-
 		btDelete.setVisible(false);
 
-		vbPane.setSpacing(15);
-		pane.setPadding(new Insets(10,10,10,10));
-
 		vbPane.getChildren().addAll(taResults,btDelete);
+		vbPane.setSpacing(10);
 		vbPane.setAlignment(Pos.CENTER);
 		pane.setTop(list);
 		pane.setCenter(vbPane);
+		pane.setPadding(new Insets(10));
 		Scene mainScene = new Scene(pane);
 		mainStage.setScene(mainScene);
 		mainStage.setTitle("Delete Jogging Spot");
@@ -121,13 +120,12 @@ public class JSApp_Del extends Application{
 		mainStage.setHeight(400);
 		mainStage.show();
 		
-		EventHandler<ActionEvent> handleDelete = (ActionEvent e) -> {
-				deleteJS();
-				
-		};
+		EventHandler<ActionEvent> handleDelete = (ActionEvent e) -> deleteJS();
 		btDelete.setOnAction(handleDelete);
+		
+		
 	}
-	private void loadIntoArray() {
+	 void loadIntoArray() {
 		try {
 			String sql = "SELECT * FROM jogging_spot";
 			ResultSet rs = DBUtil.getTable(sql);
@@ -174,16 +172,19 @@ public class JSApp_Del extends Application{
 		
 	}
 	public void deleteJS() {
+		
 		String id =  jsList.get(index).getId();
 
 		String sql = "DELETE from jogging_spot WHERE ID = '" + id + "'";
 		int rowsAffected = DBUtil.execSQL(sql);
 		
 		if (rowsAffected == 1) {
+			list.getItems().remove(index);
 			taResults.setText("Jogging Spot deleted!");
 		}
 		else {
 			taResults.setText("Delete Failed!");
 		}
 	}
+
 }
