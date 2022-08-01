@@ -126,7 +126,7 @@ public class JSApp_FindJS extends Application{
 		
 		Scene mainScene = new Scene(pane);
 		mainStage.setScene(mainScene);
-		mainStage.setTitle("Delete Jogging Spot");
+		mainStage.setTitle("Find Jogging Spot");
 		mainStage.setWidth(600);
 		mainStage.setHeight(400);
 		mainStage.show();
@@ -134,12 +134,19 @@ public class JSApp_FindJS extends Application{
 		EventHandler<ActionEvent> handleDelete = (ActionEvent e) -> deleteJS();
 		btDelete.setOnAction(handleDelete);
 		
-		EventHandler<ActionEvent> handleEdit = (ActionEvent e) -> {	
+		EventHandler<ActionEvent> handleEventAdd = (ActionEvent e) -> {	
 			JSApp_EventDate js = new JSApp_EventDate();
 			js.store(index, jsList);
 			js.start(new Stage());
 		};
-		btEventDate.setOnAction(handleEdit);
+		btEventDate.setOnAction(handleEventAdd);
+		
+		EventHandler<ActionEvent> handleEdit = (ActionEvent e) -> {	
+			JSApp_Edit js = new JSApp_Edit();
+			js.store(index, jsList);
+			js.start(new Stage());
+		};
+		btEdit.setOnAction(handleEdit);
 	}
 	 public void loadIntoArray() {
 		try {

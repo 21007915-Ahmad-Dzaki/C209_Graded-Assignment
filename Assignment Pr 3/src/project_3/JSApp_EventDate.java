@@ -64,7 +64,8 @@ public class JSApp_EventDate extends Application{
 		String connectionString = "jdbc:mysql://localhost:3306/assignment_pr_3";
 		String userid = "root";
 		String password = "";
-	
+		
+		datePick.setEditable(false);
 		DBUtil.init(connectionString, userid, password);
 		id.setText("ID:"+jsList.get(index).getId());
 		id.setAlignment(Pos.CENTER);

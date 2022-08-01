@@ -256,10 +256,6 @@ public class JSApp_JFX extends Application{
 				}
 				output+=outputStadium;
 			}
-		
-		if(!checkPark.isSelected() && !checkPC.isSelected() && !checkStadium.isSelected()) {
-			output="";
-		}
 		taResults.setText(output);
 	}
 		

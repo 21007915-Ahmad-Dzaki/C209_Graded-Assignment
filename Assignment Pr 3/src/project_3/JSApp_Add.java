@@ -53,8 +53,8 @@ public class JSApp_Add extends Application {
 	private Label lbName = new Label("Name");
 	private Label lbCat = new Label("Category");
 	private Label lbSeaview = new Label("Is there a Seaview? (Y/N)");
-	private Label lbDistance = new Label("What is the total distance?");
-	private Label lbClosingTime = new Label("What is the closing time? (hh:mm)");
+	private Label lbDistance = new Label("Enter total distance");
+	private Label lbClosingTime = new Label("Enter Closing Time? (hh:mm)");
 	
 	private RadioButton RBPark = new RadioButton("Park");
 	private RadioButton RBPC= new RadioButton("Park Connector");
@@ -175,7 +175,7 @@ public class JSApp_Add extends Application {
 		}
 		if (RBStadium.isSelected()&& !tfName.getText().isBlank()) {
 			LocalTime closeTime = LocalTime.of(hourValue, minValue);
-			System.out.println(closeTime);
+//			System.out.println(closeTime);
 			sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
 					+ "VALUES ('" + newID + "' ,'" + name + "', '" + "Stadium" + "'," + null + "," + null + ",'" + closeTime + "'" + ")";
 			rowsAffected = DBUtil.execSQL(sql);
