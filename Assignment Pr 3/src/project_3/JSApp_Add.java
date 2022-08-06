@@ -89,7 +89,6 @@ public class JSApp_Add extends Application {
 		DBUtil.init(JDBC_URL, DB_USERNAME, DB_PASSWORD);
 		
 		lbWelcome.setFont(Font.font("Arial",15));
-		RBPark.setSelected(true);
 		RBgroup.getToggles().addAll(RBPark,RBPC,RBStadium);
 		
 		for (int i = 0; i<24;i++) {

@@ -139,6 +139,7 @@ public class JSApp_FindJS extends Application{
 			js.store(index, jsList);
 			js.start(new Stage());
 		};
+		
 		btEventDate.setOnAction(handleEventAdd);
 		
 		EventHandler<ActionEvent> handleEdit = (ActionEvent e) -> {	
@@ -195,7 +196,8 @@ public class JSApp_FindJS extends Application{
 		
 	}
 	public void deleteJS() {
-		
+		jsList.clear();
+		loadIntoArray();
 		String id =  jsList.get(index).getId();
 
 		String sql = "DELETE from jogging_spot WHERE ID = '" + id + "'";

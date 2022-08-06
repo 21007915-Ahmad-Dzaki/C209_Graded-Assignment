@@ -82,6 +82,8 @@ public class JSAppTestPart2 {
 	}
 	
 	private void viewAllSpots() {
+		jsList.clear();
+		loadItems();
 		String outputPark = String.format("%-10s %-30s %-30s %-30s\n", "ID","NAME","CATEGORY", "SEAVIEW");
 		String outputPC = String.format("%-10s %-30s %-30s %-30s\n", "ID","NAME","CATEGORY", "DISTANCE");
 		String outputStadium = "";
@@ -112,6 +114,8 @@ public class JSAppTestPart2 {
 	}
 	
 	private void viewByCat() {
+		jsList.clear();
+		loadItems();
 		String outputPark = String.format("%-10s %-30s %-30s %-30s\n", "ID","NAME","CATEGORY", "SEAVIEW");
 		String outputPC = String.format("%-10s %-30s %-30s %-30s\n", "ID","NAME","CATEGORY", "DISTANCE");
 		String outputStadium = "";
@@ -205,13 +209,15 @@ public class JSAppTestPart2 {
 		System.out.println("ADDING JOGGING SPOT");
 		Helper.line(40, "-");
 		String name = Helper.readString("Enter name > ");
-		String cat = Helper.readStringRegEx("Enter Category > ", "([p|P]ark)|([p|P]ark\\s[c|C]onnector)|([s|S]tadium)");
-		// making the First letter to be capital
-		String firstLetter = cat.substring(0,1).toUpperCase();
-		String rmgLetter = cat.substring(1).toLowerCase();
-		cat = firstLetter + rmgLetter;
+		Helper.line(40, "-");
+		System.out.println("1. Park");
+		System.out.println("2. Park Connector");
+		System.out.println("3. Stadium");
+		int cat = Helper.readInt("Choose Category > ");
 		
-		if (cat.toLowerCase().equals("park")) {
+		
+		
+		if (cat==1) {
 			boolean seaview = Helper.readBoolean("Does the park have a seaview? (y/n) > ");
 			if (seaview) {
 				hasSeaview = 1;
@@ -220,22 +226,25 @@ public class JSAppTestPart2 {
 				hasSeaview = 0;
 			}
 			sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
-					+ "VALUES ('" + newID + "' ,'"+ name + "', '" + cat + "', '"+ hasSeaview +"'," + null+ "," + null + ")";
+					+ "VALUES ('" + newID + "' ,'"+ name + "', '" + "Park" + "', '"+ hasSeaview +"'," + null+ "," + null + ")";
 			rowsAffected = DBUtil.execSQL(sql);
 		}
-		else if (cat.toLowerCase().equals("park connector")) {
+		else if (cat==2) {
 			double distance = Helper.readDouble("Enter total distance for park connector > ");
 			sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
-					+ "VALUES ('" + newID + "' ,'"+ name + "', '" + cat + "', "+ null +", '" + distance + "',"+ null + ")";
+					+ "VALUES ('" + newID + "' ,'"+ name + "', '" + "Park Connector" + "', "+ null +", '" + distance + "',"+ null + ")";
 			rowsAffected = DBUtil.execSQL(sql);
 		}
-		else if (cat.toLowerCase().equals("stadium")) {
-			String ct = Helper.readString("Enter closing time for stadium (hh:mm:ss) > ");
+		else if (cat==3) {
+			String ct = Helper.readString("Enter closing time for stadium (hh:mm) > ");
+			while (!ct.matches("([01]?[0-9]|2[0-3]):[0-5][0-9]")) {
+				System.out.println("Enter a valid time (hh:mm)");
+				ct = Helper.readString("Enter closing time for stadium (hh:mm) > ");
+			}
 			LocalTime closeTime = LocalTime.parse(ct);
 			sql = "INSERT INTO jogging_spot(ID, Name, Category, HasSeaview, DistanceKm, ClosingTime) " 
-					+ "VALUES ('" + newID + "' ,'" + name + "', '" + cat + "'," + null + "," + null + ",'" + closeTime + "'" + ")";
+					+ "VALUES ('" + newID + "' ,'" + name + "', '" + "Stadium" + "'," + null + "," + null + ",'" + closeTime + "'" + ")";
 			rowsAffected = DBUtil.execSQL(sql);
-			
 		}
 		if (rowsAffected == 1) {
 			System.out.println("Jogging Spot added!");

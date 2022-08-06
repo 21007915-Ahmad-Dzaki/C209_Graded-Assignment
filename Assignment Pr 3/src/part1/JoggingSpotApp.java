@@ -6,7 +6,7 @@
  * Ahmad Dzaki Bin Osman,21007915, 11 Jun 2022 7:08:20 pm
  */
 
-package project_3;
+package part1;
 
 
 import java.sql.ResultSet;
@@ -14,6 +14,13 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.time.LocalTime;
 import java.util.ArrayList;
+
+import project_3.DBUtil;
+import project_3.Helper;
+import project_3.JoggingSpot;
+import project_3.Park;
+import project_3.ParkConnector;
+import project_3.Stadium;
 
 
 /**
